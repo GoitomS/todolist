@@ -56,7 +56,7 @@ const Api = (() => {
   
   
 
-  // * ~~~~~~~~~~~~~~~~~~~ View ~~~~~~~~~~~~~~~~~~~
+  // DOM related ops
   const View = (() => {
     const domstr = {
       todocontainer: "#todolist_container",
@@ -79,7 +79,7 @@ const Api = (() => {
             tmp += `<li>
             <button class="statusbtn" id="status${todo.id}">undo</button>
             <span>${todo.title}</span>
-            <button class="updatebtn" id="update${todo.id}">Edit</button>
+            <button class="updatebtn" id="edit${todo.id}">Edit</button>
             <button class="deletebtn" id="${todo.id}">Delete</button>
             </li>`;
             break;
@@ -87,7 +87,7 @@ const Api = (() => {
             tmp += `
             <li>
             <span>${todo.title}</span>
-            <button class="updatebtn" id="update${todo.id}">Edit</button>
+            <button class="updatebtn" id="edit${todo.id}">Edit</button>
             <button class="deletebtn" id="${todo.id}">Delete</button>
             <button class="statusbtn" id="status${todo.id}">done</button>
           </li>
@@ -99,7 +99,7 @@ const Api = (() => {
             tmp += `
                   <li>
                     <input type="text" value="${todo.title}" id="input${todo.id}">
-                    <button class="updatebtn" id="update${todo.id}">Edit</button>
+                    <button class="updatebtn" id="edit${todo.id}">Edit</button>
                     <button class="deletebtn" id="${todo.id}">Delete</button>
                     <button class="statusbtn" id="status${todo.id}">done</button>
                   </li>
@@ -109,7 +109,7 @@ const Api = (() => {
                 <li>
                     <button class="statusbtn" id="status${todo.id}">undo</button>
                     <input type="text" value="${todo.title}" id="input${todo.id}">
-                    <button class="updatebtn" id="update${todo.id}">Edit</button>
+                    <button class="updatebtn" id="edit${todo.id}">Edit</button>
                     <button class="deletebtn" id="${todo.id}">Delete</button>
                 </li>
                 `;
@@ -127,7 +127,7 @@ const Api = (() => {
       status,
     };
   })();
-  
+//   All data models
     const Model = ((api, view) => {
         const { getTodos, deleteTodo, addTodo, editTodo, statusChange } =
           api;
@@ -198,5 +198,99 @@ const Api = (() => {
           Todo,
         };
       })(Api, View);
+    //   Interactions
+    const Controller = ((model, view) => {
+        const state = new model.State();
       
-    // ___________________________________________________________________________
+        const deleteTodo = () => {
+          const todocontainer = document.querySelector(view.domstr.todocontainer);
+          todocontainer.addEventListener("click", (event) => {
+            if (event.target.className === "deletebtn") {
+              state.todolist = state.todolist.filter(
+                (todo) => +todo.id !== +event.target.id
+              );
+              model.deleteTodo(+event.target.id);
+            }
+          });
+        };
+      
+        const addTodo = () => {
+          const inputbox = document.querySelector(view.domstr.inputbox);
+          const inputbtn = document.querySelector(view.domstr.addtoList);
+          inputbox.addEventListener("keyup", (event) => {
+            if (event.key === "Enter" && event.target.value.trim() !== "") {
+              const todo = new model.Todo(event.target.value);
+              model.addTodo(todo).then((todofromBE) => {
+                state.todolist = [todofromBE, ...state.todolist];
+              });
+              event.target.value = "";
+            }
+          });
+          inputbtn.addEventListener("click", (event) => {
+            if (inputbox.value.trim() !== "") {
+              const todo = new model.Todo(inputbox.value);
+              model.addTodo(todo).then((todofromBE) => {
+                state.todolist = [todofromBE, ...state.todolist];
+              });
+              event.target.value = "";
+            }
+          });
+        };
+      
+        const editTodo = () => {
+          const todocontainer = document.querySelector(view.domstr.todocontainer);
+          todocontainer.addEventListener("click", (event) => {
+            const selectedId = +event.target.id.substring(4, event.target.id.length);
+            if (event.target.className === "updatebtn") {
+              if (!state.updateStatus[selectedId]) {
+                state.updateStatus[selectedId] = true;
+                state.todolist = state.todolist;
+              } else if (state.updateStatus[selectedId]) {
+                state.updateStatus = {};
+                const inputstr = document.querySelector(
+                  view.domstr.inputid + selectedId
+                ).value;
+                model.editTodo(selectedId, inputstr);
+                state.todolist = state.todolist.map((todo) => {
+                  if (+todo.id === +selectedId) todo.title = inputstr;
+                  return todo;
+                });
+              }
+            }
+          });
+        };
+      
+        const statusChange = () => {
+          const todocontainer = document.querySelector(view.domstr.todocontainer);
+          todocontainer.addEventListener("click", (event) => {
+            if (event.target.className === "statusbtn") {
+              const selectedId = +event.target.id.substring(6, event.target.id.length);
+              state.todolist = state.todolist.map((todo) => {
+                if (+todo.id === +selectedId) {
+                  model.statusChange(+todo.id, !todo.completed);
+                  todo.completed = !todo.completed;
+                }
+                return todo;
+              });
+            }
+          });
+        };
+      
+        const init = () => {
+          model.getTodos().then((todos) => {
+            state.todolist = todos.reverse();
+          });
+        };
+      
+        const bootstrap = () => {
+          init();
+          deleteTodo();
+          addTodo();
+          editTodo();
+          statusChange();
+        };
+      
+        return { bootstrap };
+      })(Model, View);
+      
+      Controller.bootstrap();
