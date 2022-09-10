@@ -1,0 +1,126 @@
+  * {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+  }
+  
+  body {
+	width: 100vw;
+	height: 100vh;
+	
+  }
+  
+  .content {
+	width: 100%;
+	height: 100%;
+  }
+  
+  .todolist {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+  
+  .todolist_input_container {
+	padding: 30px;
+	display: flex;
+	justify-content: center;
+  }
+   
+  .todolist_input_container input {
+	width: 150px;
+	height: 30px;
+	outline: none;
+	border: 1px solid rgb(225, 225, 225);
+
+  }
+  
+  .todolist_input_container > button {
+	color: rgb(255, 255, 255);
+	background-color: blue;
+	height: 25px;
+	border: none;
+	border-radius: 3px;
+	padding: 5px;
+  }
+  
+  .todolist_input_container > button:hover {
+	cursor: pointer;
+  }
+
+  
+  #todolist_container {
+	height: 70%;
+	width: 700px;
+	display: flex;
+	flex-direction: row;
+
+  }
+  
+  #todolist_container div {
+	height: 100%;
+	width: 300px;
+	border: 1px solid rgb(195, 232, 34);
+	display: flex;
+	flex-direction: column;
+	margin: 5px;
+	padding: 10px;
+  }
+  
+  #todolist_container li {
+	
+	display: flex;
+	align-items: end;
+	margin-top: 15px;
+  }
+  
+  #todolist_container li > * {
+	margin-left: 5px;
+  }
+  
+  #todolist_container li > button {
+	width: 50px;
+	height: 25px;
+	outline: none;
+	border: none;
+	border-radius: 5px;
+  }
+  
+  .updatebtn {
+	background-color: blue;
+	color: white;
+  }
+  
+  .updatebtn:hover {
+	background-color: rgb(9, 255, 0);
+  }
+  
+  .deletebtn {
+	background-color: rgb(255, 221, 0);
+	color: white;
+  }
+
+  .deletebtn:hover {
+	background-color: blue;
+  }
+
+  .statusbtn {
+	background-color: rgb(77, 255, 0);
+	color: white;
+  }
+
+  .statusbtn:hover {
+	background-color: rgb(255, 221, 0);
+  }
+  
+  #todolist_container li > span {
+	display: inline-block;
+	width: 50%;
+	height: 25px;
+  
+	width: calc(var(--width-todolist/2));
+	text-align: center;
+  }
+  
