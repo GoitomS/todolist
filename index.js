@@ -128,5 +128,75 @@ const Api = (() => {
     };
   })();
   
+    const Model = ((api, view) => {
+        const { getTodos, deleteTodo, addTodo, editTodo, statusChange } =
+          api;
+      
+        class Todo {
+          constructor(title) {
+            this.title = title;
+            this.completed = false;
+          }
+        }
+      
+        class State {
+          #todolist = [];
+          #pendingList = [];
+          #completedList = [];
+          #updateStatus = {};
+      
+          get todolist() {
+            return this.#todolist;
+          }
+          set todolist(newtodolist) {
+            this.#todolist = newtodolist;
+      
+            this.#completedList = newtodolist.filter((todo) => {
+              return todo.completed === true;
+            });
+            this.#pendingList = newtodolist.filter((todo) => {
+              return todo.completed === false;
+            });
+      
+            const todotasks = document.querySelector(
+              view.domstr.todotasks
+            );
+            const pendingTmp = view.createTmp(
+              this.#updateStatus,
+              this.#pendingList
+            );
+      
+            const doneTasks = document.querySelector(
+              view.domstr.doneTasks
+            );
+      
+            const completedTmp = view.createTmp(
+              this.#updateStatus,
+              this.#completedList
+            );
+
+            view.render(todotasks, pendingTmp);
+            view.render(doneTasks, completedTmp);
+          }
+      
+          get updateStatus() {
+            return this.#updateStatus;
+          }
+      
+          set updateStatus(newObj) {
+            this.#updateStatus = newObj;
+          }
+        }
+      
+        return {
+          getTodos,
+          deleteTodo,
+          addTodo,
+          editTodo,
+          statusChange,
+          State,
+          Todo,
+        };
+      })(Api, View);
+      
     // ___________________________________________________________________________
-  
